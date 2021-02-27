@@ -1,0 +1,117 @@
+{% include 'boilerplates/header.html' %}
+{% block content %}
+
+    <div class="container d-block mt-5">
+        <h1>Calories</h1>
+        <p>Previously logged meals</p>
+
+        <div class="row" style="justify-content: space-around">
+            <div class="card text-white bg-primary mb-3 col calories-form-card">
+                <div class="card-header">Log Calories</div>
+                <div class="card-body">
+                    <h4 class="card-title">Log Calories</h4>
+                    <form action="/log_calories/" method="POST">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-6">
+                                <input type="text" class="form-control" required name="food" placeholder="Name of food consumed">
+                            </div>
+
+                            <div class="col-6">
+                                <input type="number" class="form-control" required name="kcal" min="1" step="any"
+                                       placeholder="Estimated number of calories in kcal">
+                            </div>
+
+                            <div class="col-12">
+                                <input type="date" class="homepage-date-input" name="date" required
+                                       value="{{ todays_date }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success d-block w-100">Log Data</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card text-white bg-primary mb-3 col calories-form-card">
+                <div class="card-header">Log Calories from CSV</div>
+                <div class="card-body">
+                    <h4 class="card-title">Log Calories (from CSV)</h4>
+                    <form action="/log_calories_from_csv/" method="POST" enctype="multipart/form-data">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-12">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" name="calories_csv" required>
+                                    <label class="custom-file-label" >Choose CSV file</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <input type="date" class="homepage-date-input" name="date" required
+                                       value="{{ todays_date }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success d-block w-100">Upload CSV</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="accordion">
+            {% for date, meals in meals.items() %}
+                <div class="card border-secondary mb-3">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#caloriesCollapse_{{ loop.index }}"
+                                        aria-expanded="true" aria-controls="caloriesCollapse">
+                                    Logged Calories on: <strong>{{ date }}</strong>
+                                </button>
+                            </div>
+
+                            <div class="col">
+                                <h4 style="text-align: right;" class="text-warning"><strong>{{ meals | sum(attribute='kcal') }}</strong> kcal</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="caloriesCollapse_{{ loop.index }}" class="collapse {% if loop.index == 1 %}show{% endif %}" data-parent="#accordion">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Calories: {{ meals | sum(attribute='kcal') }} kcal</h4>
+                            <form action="/delete_all_calorie_logs/{{ date }}/" method="POST" class="mb-3">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove all logs for this day
+                                </button>
+                            </form>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Food</th>
+                                    <th scope="col">Calories (KCAL)</th>
+                                    <th scope="col" style="text-align: right">Actions</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                {% for meal in meals %}
+                                    <tr>
+                                        <td>{{ meal.food }}</td>
+                                        <td>{{ meal.kcal }}</td>
+                                        <td>
+                                            <form action="/delete/{{ meal.calories_id }}/"
+                                                  style="text-align: right;" , method="POST">
+                                                <button type="submit" class="btn btn-sm btn-danger"><i
+                                                        class="bi bi-x-octagon"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+{% include 'boilerplates/footer.html' %}
