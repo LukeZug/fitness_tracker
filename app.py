@@ -80,11 +80,12 @@ print(f'Generated secret key: {SECRET_KEY}')
 
 # Database models
 class LoggedWeight(db.Model):
-    weight = db.Column(db.String(255), primary_key=True, nullable=False)
+    weight_stone = db.Column(db.String(255), primary_key=True, nullable=False)
+    weight_pounds = db.Column(db.String(255), nullable=False)
     date = db.Column(db.Date(), primary_key=True, nullable=False)
 
     def __repr__(self):
-        return '<LoggedWeight %r>' % self.weight
+        return '<LoggedWeight %r>' % self.weight_stone
 
 
 class Calories(db.Model):
@@ -129,16 +130,17 @@ def home():
 @app.route('/upload/', methods=['POST'])
 def upload():
     if request.method == 'POST':
-        weight = request.form['weight']
+        weight_stone = request.form['weight_stone']
+        weight_pounds = request.form['weight_pounds']
         date = request.form['date']
 
-        new_weight_to_add = LoggedWeight(weight=weight, date=date)
+        new_weight_to_add = LoggedWeight(weight_stone=weight_stone, weight_pounds=weight_pounds, date=date)
 
         try:
             db.session.add(new_weight_to_add)
             db.session.commit()
         except:
-            error_message = f'Tried to add weight: <{weight}> and date: <{date}>' \
+            error_message = f'Tried to add weight: <{weight_stone}st {weight_pounds}lbs> and date: <{date}>' \
                             f' to the database, but failed in the process.'
             app.logger.info(error_message)
             flash(error_message)
@@ -155,7 +157,7 @@ def delete_record(date, weight):
         new_date_object = original_time.strftime('%Y-%m-%d')
 
         record_to_delete = LoggedWeight.query\
-            .filter(LoggedWeight.weight == weight)\
+            .filter(LoggedWeight.weight_stone == weight)\
             .filter(LoggedWeight.date == new_date_object).first()
 
         db.session.delete(record_to_delete)

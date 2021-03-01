@@ -15,39 +15,39 @@
 
         <h1>Weight Tracker</h1>
 
-        {% set target_weight = cookies.get('weight_target') %}
-        {% if target_weight%}
-            {% set last_logged_weight = logged_weights[0].weight %}
-            {% set percentage_to_target = ((last_logged_weight|float / target_weight|float)*100) | int %}
-
-            {% if percentage_to_target >= 100 %}
-                {% set target_reached = True %}
-            {% elif percentage_to_target > 80 %}
-                {% set badge_colour = 'success' %}
-            {% elif percentage_to_target > 50 %}
-                {% set badge_colour = 'warning' %}
-            {% else %}
-                {% set badge_colour = 'danger' %}
-            {% endif %}
-
-            <div class="mt-3 mb-5">
-                <p id="progress-text">
-                    Your progress to <strong>{{ target_weight }} st</strong>
-                    {% if not target_reached %}
-                        <span class="badge badge-pill badge-{{ badge_colour }} percentage-pill">{{ percentage_to_target }}%</span>
-                    {% else %}
-                        <span class="badge badge-pill badge-success percentage-pill">Complete, well done!</span>
-                    {% endif %}
-                </p>
-                <div class="progress">
-                    {% if not target_reached %}
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percentage_to_target }}%;"></div>
-                    {% else %}
-                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
+{#        {% set target_weight = cookies.get('weight_target') %}#}
+{#        {% if target_weight%}#}
+{#            {% set last_logged_weight = logged_weights[0].weight %}#}
+{#            {% set percentage_to_target = ((last_logged_weight|float / target_weight|float)*100) | int %}#}
+{##}
+{#            {% if percentage_to_target >= 100 %}#}
+{#                {% set target_reached = True %}#}
+{#            {% elif percentage_to_target > 80 %}#}
+{#                {% set badge_colour = 'success' %}#}
+{#            {% elif percentage_to_target > 50 %}#}
+{#                {% set badge_colour = 'warning' %}#}
+{#            {% else %}#}
+{#                {% set badge_colour = 'danger' %}#}
+{#            {% endif %}#}
+{##}
+{#            <div class="mt-3 mb-5">#}
+{#                <p id="progress-text">#}
+{#                    Your progress to <strong>{{ target_weight }} st</strong>#}
+{#                    {% if not target_reached %}#}
+{#                        <span class="badge badge-pill badge-{{ badge_colour }} percentage-pill">{{ percentage_to_target }}%</span>#}
+{#                    {% else %}#}
+{#                        <span class="badge badge-pill badge-success percentage-pill">Complete, well done!</span>#}
+{#                    {% endif %}#}
+{#                </p>#}
+{#                <div class="progress">#}
+{#                    {% if not target_reached %}#}
+{#                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percentage_to_target }}%;"></div>#}
+{#                    {% else %}#}
+{#                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{#            </div>#}
+{#        {% endif %}#}
 
         <div class="row mt-4" style="justify-content: space-between;">
             <div class="card border-light mb-3 col homepage-form-card">
@@ -57,7 +57,11 @@
                         <form action="/upload/" method="POST">
                             <div class="row mb-3 mt-3">
                                 <div class="col-12">
-                                    <input type="number" class="form-control" required name="weight" min="1" step="any" placeholder="Weight in Stone (e.g 8.6)">
+                                    <input type="number" class="form-control" required name="weight_stone" min="1" step="any" placeholder="Weight in Stone (e.g 8)">
+                                </div>
+
+                                <div class="col-12">
+                                    <input type="number" class="form-control" required name="weight_pounds" min="1" step="any" placeholder="Weight in LBS (e.g 6)">
                                 </div>
 
                                 <div class="col-12">
@@ -126,30 +130,33 @@
 
             <tbody>
                 {% if logged_weights | length > 0 %}
-                    {% set next_weight = namespace(value=logged_weights[1].weight) if logged_weights | length > 1 else namespace(value=logged_weights[0].weight) %}
+                    {% set ns = namespace(next_weight=logged_weights[1]) if logged_weights | length > 1 else namespace(next_weight=logged_weights[0]) %}
                     {% for log_instance in logged_weights %}
-                        {% set weight_difference = (log_instance.weight | float) - (next_weight.value | float) %}
+                        {% set next_weight = ns.next_weight %}
+                        {% set current_weight_lbs = ((log_instance.weight_stone | int) * 14) + (log_instance.weight_pounds | float) %}
+                        {% set next_weight_lbs = ((next_weight.weight_stone | int) * 14) + (next_weight.weight_pounds | float) %}
+                        {% set weight_difference_lbs = current_weight_lbs - next_weight_lbs %}
                         <tr>
                             <td>{{ log_instance.date }}</td>
-                            <td>{{ log_instance.weight }} st</td>
+                            <td>{{ log_instance.weight_stone }}st {{ log_instance.weight_pounds }}lbs</td>
 
-                            {% if weight_difference > 0  %}
-                                <td style="color: green;"><i class="bi bi-arrow-up-right-circle"></i> {{ weight_difference | abs | round(2) }} st</td>
-                            {% elif weight_difference < 0 %}
-                                <td style="color: red;"><i class="bi bi-arrow-down-left-circle"></i> {{ weight_difference | abs | round(2) }} st</td>
+                            {% if weight_difference_lbs > 0  %}
+                                <td style="color: green;"><i class="bi bi-arrow-up-right-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs</td>
+                            {% elif weight_difference_lbs < 0 %}
+                                <td style="color: red;"><i class="bi bi-arrow-down-left-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs</td>
                             {% else %}
-                                <td style="color: orange;"><i class="bi bi-circle"></i> {{ weight_difference }} st</td>
+                                <td style="color: orange;"><i class="bi bi-circle"></i> 0st 0lbs</td>
                             {% endif %}
 
                             <td>
-                                <form action="/delete/{{ log_instance.date }}/{{ log_instance.weight }}/" style="text-align: right;", method="POST">
+                                <form action="/delete/{{ log_instance.date }}/{{ log_instance.weight_stone }}/" style="text-align: right;", method="POST">
                                     <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x-octagon"></i></button>
                                 </form>
                             </td>
                         </tr>
 
                         {% if loop.index < (logged_weights|length - 1) %}
-                            {% set next_weight.value = namespace(value=logged_weights[loop.index + 1].weight).value %}
+                            {% set ns.next_weight = logged_weights[loop.index + 1] %}
                         {% endif %}
 
                     {% endfor %}
