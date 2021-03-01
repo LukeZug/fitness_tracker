@@ -148,6 +148,8 @@
                                 <td style="color: orange;"><i class="bi bi-circle"></i> 0st 0lbs</td>
                             {% endif %}
 
+{#                            TODO: Make sure to also show the increase/decrease in stone, and not just in lbs.#}
+
                             <td>
                                 <form action="/delete/{{ log_instance.date }}/{{ log_instance.weight_stone }}/" style="text-align: right;", method="POST">
                                     <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x-octagon"></i></button>
