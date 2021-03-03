@@ -15,39 +15,39 @@
 
         <h1>Weight Tracker</h1>
 
-{#        {% set target_weight = cookies.get('weight_target') %}#}
-{#        {% if target_weight%}#}
-{#            {% set last_logged_weight = logged_weights[0].weight %}#}
-{#            {% set percentage_to_target = ((last_logged_weight|float / target_weight|float)*100) | int %}#}
-{##}
-{#            {% if percentage_to_target >= 100 %}#}
-{#                {% set target_reached = True %}#}
-{#            {% elif percentage_to_target > 80 %}#}
-{#                {% set badge_colour = 'success' %}#}
-{#            {% elif percentage_to_target > 50 %}#}
-{#                {% set badge_colour = 'warning' %}#}
-{#            {% else %}#}
-{#                {% set badge_colour = 'danger' %}#}
-{#            {% endif %}#}
-{##}
-{#            <div class="mt-3 mb-5">#}
-{#                <p id="progress-text">#}
-{#                    Your progress to <strong>{{ target_weight }} st</strong>#}
-{#                    {% if not target_reached %}#}
-{#                        <span class="badge badge-pill badge-{{ badge_colour }} percentage-pill">{{ percentage_to_target }}%</span>#}
-{#                    {% else %}#}
-{#                        <span class="badge badge-pill badge-success percentage-pill">Complete, well done!</span>#}
-{#                    {% endif %}#}
-{#                </p>#}
-{#                <div class="progress">#}
-{#                    {% if not target_reached %}#}
-{#                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percentage_to_target }}%;"></div>#}
-{#                    {% else %}#}
-{#                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>#}
-{#                    {% endif %}#}
-{#                </div>#}
-{#            </div>#}
-{#        {% endif %}#}
+        {% set target_weight = (cookies.get('weight_target')|int) %}
+        {% if target_weight %}
+            {% set last_logged_weight = (logged_weights[0].weight_stone|int * 14) + (logged_weights[0].weight_pounds|float) %}
+            {% set percentage_to_target = ((last_logged_weight|int / target_weight)*100) | int %}
+
+            {% if percentage_to_target >= 100 %}
+                {% set target_reached = True %}
+            {% elif percentage_to_target > 80 %}
+                {% set badge_colour = 'success' %}
+            {% elif percentage_to_target > 50 %}
+                {% set badge_colour = 'warning' %}
+            {% else %}
+                {% set badge_colour = 'danger' %}
+            {% endif %}
+
+            <div class="mt-3 mb-5">
+                <p id="progress-text">
+                    Your progress to <strong>{{ target_weight }} lbs</strong>
+                    {% if not target_reached %}
+                        <span class="badge badge-pill badge-{{ badge_colour }} percentage-pill">{{ percentage_to_target }}%</span>
+                    {% else %}
+                        <span class="badge badge-pill badge-success percentage-pill">Complete, well done!</span>
+                    {% endif %}
+                </p>
+                <div class="progress">
+                    {% if not target_reached %}
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percentage_to_target }}%;"></div>
+                    {% else %}
+                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
 
         <div class="row mt-4" style="justify-content: space-between;">
             <div class="card border-light mb-3 col homepage-form-card">
