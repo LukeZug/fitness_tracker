@@ -170,10 +170,14 @@ def delete_record(date, weight):
 def set_target_weight():
     # sets a cookie for the users target weight
     if request.method == 'POST':
-        target_weight = request.form['target_weight']
+        target_weight_stone = request.form['target_weight_stone']
+        target_weight_pounds = request.form['target_weight_pounds']
+
+        # convert it all to pounds before storing it as a cookie.
+        target_weight = (int(target_weight_stone) * 14) + float(target_weight_pounds)
 
         resp = make_response(redirect(url_for('home')))
-        resp.set_cookie('weight_target', target_weight, max_age=NUM_SECONDS_IN_MONTH)
+        resp.set_cookie('weight_target', str(target_weight), max_age=NUM_SECONDS_IN_MONTH)
 
         return resp
 

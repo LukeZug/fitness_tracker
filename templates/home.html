@@ -6,8 +6,8 @@
             {% if messages %}
                 {% for error_message in messages %}
                     <div class="alert alert-dismissible alert-danger">
-                      <button type="button" class="close" data-dismiss="alert">&times;</button>
-                      <strong>Oops!</strong> {{ error_message }}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <strong>Oops!</strong> {{ error_message }}
                     </div>
                 {% endfor %}
             {% endif %}
@@ -32,7 +32,11 @@
 
             <div class="mt-3 mb-5">
                 <p id="progress-text">
-                    Your progress to <strong>{{ target_weight }} lbs</strong>
+
+                    {% set target_stone = target_weight // 14 %}
+                    {% set target_pounds = target_weight - (target_stone * 14) %}
+
+                    Your progress to <strong>{{ target_stone }}st {{ target_pounds }}lbs</strong>
                     {% if not target_reached %}
                         <span class="badge badge-pill badge-{{ badge_colour }} percentage-pill">{{ percentage_to_target }}%</span>
                     {% else %}
@@ -41,9 +45,13 @@
                 </p>
                 <div class="progress">
                     {% if not target_reached %}
-                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ percentage_to_target }}%;"></div>
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                             aria-valuenow="{{ percentage_to_target }}" aria-valuemin="0" aria-valuemax="100"
+                             style="width: {{ percentage_to_target }}%;"></div>
                     {% else %}
-                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-success progress-bar-animated"
+                             role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0"
+                             aria-valuemax="100"></div>
                     {% endif %}
                 </div>
             </div>
@@ -52,68 +60,79 @@
         <div class="row mt-4" style="justify-content: space-between;">
             <div class="card border-light mb-3 col homepage-form-card">
                 <div class="card-header">Log Weight</div>
-                  <div class="card-body">
-                        <h4 class="card-title">Log your weight</h4>
-                        <form action="/upload/" method="POST">
-                            <div class="row mb-3 mt-3">
-                                <div class="col-12">
-                                    <input type="number" class="form-control" required name="weight_stone" min="1" step="any" placeholder="Weight in Stone (e.g 8)">
-                                </div>
-
-                                <div class="col-12">
-                                    <input type="number" class="form-control" required name="weight_pounds" min="1" step="any" placeholder="Weight in LBS (e.g 6)">
-                                </div>
-
-                                <div class="col-12">
-                                    <input type="date" class="homepage-date-input" name="date" required value="{{ todays_date }}">
-                                </div>
+                <div class="card-body">
+                    <h4 class="card-title">Log your weight</h4>
+                    <form action="/upload/" method="POST">
+                        <div class="row mb-3 mt-3">
+                            <div class="col-12">
+                                <input type="number" class="form-control" required name="weight_stone" min="1"
+                                       step="any" placeholder="Weight in Stone (e.g 8)">
                             </div>
-                            <button type="submit" class="btn btn-primary d-block w-100">Log Data</button>
-                        </form>
-                  </div>
+
+                            <div class="col-12">
+                                <input type="number" class="form-control" required name="weight_pounds" min="1"
+                                       step="any" placeholder="Weight in LBS (e.g 6)">
+                            </div>
+
+                            <div class="col-12">
+                                <input type="date" class="homepage-date-input" name="date" required
+                                       value="{{ todays_date }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary d-block w-100">Log Data</button>
+                    </form>
+                </div>
             </div>
 
             <div class="card border-light mb-3 col homepage-form-card">
                 <div class="card-header">Calculate BMI</div>
-                  <div class="card-body">
-                        <h4 class="card-title">Calculate your BMI</h4>
-                        <form action="/calculate_bmi/" method="POST">
-                            <div class="mb-3">
-                                <input type="number" class="form-control" required name="weight" min="1" step="any" placeholder="Weight in Stone (e.g 8.6)">
-                            </div>
-                            <div class="mb-3">
-                                <input type="number" class="form-control d-inline" required name="height_feet" min="1" step="any" placeholder="Enter feet">
-                                <input type="number" class="form-control d-inline" required name="height_inches" min="1" max="12" step="any" placeholder="Enter inches">
-                            </div>
-                            <button type="submit" class="btn btn-primary d-block w-100">Calculate</button>
-                        </form>
+                <div class="card-body">
+                    <h4 class="card-title">Calculate your BMI</h4>
+                    <form action="/calculate_bmi/" method="POST">
+                        <div class="mb-3">
+                            <input type="number" class="form-control" required name="weight" min="1" step="any"
+                                   placeholder="Weight in Stone (e.g 8.6)">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control d-inline" required name="height_feet" min="1"
+                                   step="any" placeholder="Enter feet">
+                            <input type="number" class="form-control d-inline" required name="height_inches" min="1"
+                                   max="12" step="any" placeholder="Enter inches">
+                        </div>
+                        <button type="submit" class="btn btn-primary d-block w-100">Calculate</button>
+                    </form>
 
-                        {% if bmi %}
-                            <div class="alert alert-dismissible alert-success mt-4">
-                                <button type="button" class="close" data-dismiss="alert" onclick="">&times;</button>
-                                BMI returned: <strong>{{ bmi }}</strong>
-                            </div>
-                        {% endif %}
-                  </div>
+                    {% if bmi %}
+                        <div class="alert alert-dismissible alert-success mt-4">
+                            <button type="button" class="close" data-dismiss="alert" onclick="">&times;</button>
+                            BMI returned: <strong>{{ bmi }}</strong>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="card border-light mb-3 col homepage-form-card">
-                  <div class="card-header">Enter your target weight</div>
-                  <div class="card-body">
-                      <h4 class="card-title">Enter your target weight</h4>
-                      <form action="/set_target_weight/" method="POST">
-                         <div class="mb-3 mt-3">
-                             <input type="number" class="form-control" required name="target_weight" min="1" step="any" placeholder="Weight in Stone (e.g 8.6)">
-                         </div>
-                         <button type="submit" class="btn btn-primary d-block w-100" >Submit Target Weight</button>
-                      </form>
+                <div class="card-header">Enter your target weight</div>
+                <div class="card-body">
+                    <h4 class="card-title">Enter your target weight</h4>
+                    <form action="/set_target_weight/" method="POST">
+                        <div class="mt-3">
+                            <input type="number" class="form-control" required name="target_weight_stone" min="1" step="any"
+                                   placeholder="Weight in Stone (e.g 8)">
+                        </div>
+                        <div class="mb-3">
+                            <input type="number" class="form-control" required name="target_weight_pounds" min="0" step="any"
+                                   placeholder="Weight in Pounds (e.g 6)">
+                        </div>
+                        <button type="submit" class="btn btn-primary d-block w-100">Submit Target Weight</button>
+                    </form>
 
-                      {% if target_weight %}
-                          <form action="/remove_target_weight/" method="POST" class="mt-2">
-                              <button type="submit" class="btn btn-danger d-block w-100" >Clear Target</button>
-                          </form>
-                      {% endif %}
-                  </div>
+                    {% if target_weight %}
+                        <form action="/remove_target_weight/" method="POST" class="mt-2">
+                            <button type="submit" class="btn btn-danger d-block w-100">Clear Target</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -122,49 +141,55 @@
         <h2>Previously logged</h2>
         <table class="table table-hover">
             <thead>
-                <th scope="col">Date</th>
-                <th scope="col">Logged weight (stone)</th>
-                <th scope="col">Trend</th>
-                <th scope="col" style="text-align: right;">Actions</th>
+            <th scope="col">Date</th>
+            <th scope="col">Logged weight (stone)</th>
+            <th scope="col">Trend</th>
+            <th scope="col" style="text-align: right;">Actions</th>
             </thead>
 
             <tbody>
-                {% if logged_weights | length > 0 %}
-                    {% set ns = namespace(next_weight=logged_weights[1]) if logged_weights | length > 1 else namespace(next_weight=logged_weights[0]) %}
-                    {% for log_instance in logged_weights %}
-                        {% set next_weight = ns.next_weight %}
-                        {% set current_weight_lbs = ((log_instance.weight_stone | int) * 14) + (log_instance.weight_pounds | float) %}
-                        {% set next_weight_lbs = ((next_weight.weight_stone | int) * 14) + (next_weight.weight_pounds | float) %}
-                        {% set weight_difference_lbs = current_weight_lbs - next_weight_lbs %}
-                        <tr>
-                            <td>{{ log_instance.date }}</td>
-                            <td>{{ log_instance.weight_stone }}st {{ log_instance.weight_pounds }}lbs</td>
+            {% if logged_weights | length > 0 %}
+                {% set ns = namespace(next_weight=logged_weights[1]) if logged_weights | length > 1 else namespace(next_weight=logged_weights[0]) %}
+                {% for log_instance in logged_weights %}
+                    {% set next_weight = ns.next_weight %}
+                    {% set current_weight_lbs = ((log_instance.weight_stone | int) * 14) + (log_instance.weight_pounds | float) %}
+                    {% set next_weight_lbs = ((next_weight.weight_stone | int) * 14) + (next_weight.weight_pounds | float) %}
+                    {% set weight_difference_lbs = current_weight_lbs - next_weight_lbs %}
+                    <tr>
+                        <td>{{ log_instance.date }}</td>
+                        <td>{{ log_instance.weight_stone }}st {{ log_instance.weight_pounds }}lbs</td>
 
-                            {% if weight_difference_lbs > 0  %}
-                                <td style="color: green;"><i class="bi bi-arrow-up-right-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs</td>
-                            {% elif weight_difference_lbs < 0 %}
-                                <td style="color: red;"><i class="bi bi-arrow-down-left-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs</td>
-                            {% else %}
-                                <td style="color: orange;"><i class="bi bi-circle"></i> 0st 0lbs</td>
-                            {% endif %}
-
-{#                            TODO: Make sure to also show the increase/decrease in stone, and not just in lbs.#}
-
-                            <td>
-                                <form action="/delete/{{ log_instance.date }}/{{ log_instance.weight_stone }}/" style="text-align: right;", method="POST">
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x-octagon"></i></button>
-                                </form>
+                        {% if weight_difference_lbs > 0 %}
+                            <td style="color: green;"><i
+                                    class="bi bi-arrow-up-right-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs
                             </td>
-                        </tr>
-
-                        {% if loop.index < (logged_weights|length - 1) %}
-                            {% set ns.next_weight = logged_weights[loop.index + 1] %}
+                        {% elif weight_difference_lbs < 0 %}
+                            <td style="color: red;"><i
+                                    class="bi bi-arrow-down-left-circle"></i> {{ weight_difference_lbs | abs | round(2) }}lbs
+                            </td>
+                        {% else %}
+                            <td style="color: orange;"><i class="bi bi-circle"></i> 0st 0lbs</td>
                         {% endif %}
 
-                    {% endfor %}
-                {% else %}
-                    <td>No data logged :(</td>
-                {% endif %}
+                        {#                            TODO: Make sure to also show the increase/decrease in stone, and not just in lbs.#}
+
+                        <td>
+                            <form action="/delete/{{ log_instance.date }}/{{ log_instance.weight_stone }}/"
+                                  style="text-align: right;" , method="POST">
+                                <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-x-octagon"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    {% if loop.index < (logged_weights|length - 1) %}
+                        {% set ns.next_weight = logged_weights[loop.index + 1] %}
+                    {% endif %}
+
+                {% endfor %}
+            {% else %}
+                <td>No data logged :(</td>
+            {% endif %}
             </tbody>
         </table>
     </div>
